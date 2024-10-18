@@ -1,54 +1,76 @@
-// Build the metadata panel
-d3.json("https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json").then((output) => {
- //Add a variable for the country from the country array
- const countries = output.country;
 
- //Create the dropdown menu
- const dropdown = d3.select("#selDataset")
- countries.forEach(country => {
-    dropdown.append("option").text(country);
-  });
+//define the dropdown menu
+const dropdown = d3.select("#selDataset");
 
-  //create an initial bubble chart with the first country's data
-  const firstCountry = countries[0];
-  createBubbleChart(firstCountry);
-  });
+//define the output outside of chart
+let output;
+
+ //load in data
+ // Build the metadata panel
+d3.json("https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json").then((data) => {
+    output = data;
+    // Check if output is loaded correctly
+    console.log("Data loading:", output);
+    
+    //Add a variable for the country from the list of countries
+    const countries = [...new Set(output.map(song => song.country))]
+   
+   //create dropdown menu
+    countries.forEach(country => {
+        dropdown.append("option").text(country).attr("value", country);
+    });
+
+    //create an initial bubble chart with the first country's data
+    const firstCountry = countries[0];
+    createBubbleChart(firstCountry, output);
+    
+    // Attach an event listener to the dropdown menu
+    dropdown.on("change", function() {
+        const uniqueCountry = d3.select(this).property("value");
+        optionChanged(uniqueCountry, output);
+    });
+});
 
   // Function to create the bubble chart
-function createBubbleChart(countryName) {
-    // Filter the data for the selected country
-    d3.json('https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json').then(function(output) {
-        let countryData;
-        for (let i=0; i < output.country.length; i++) {
-            if (output.country[i] === country) {
-                countryData = output.country[i];
-                break;
-            }
-        }
+function createBubbleChart(countryName, output) {
+    // Check if output is defined
+    if (!output) {
+        console.error("Output data is undefined.");
+        return;
+    }
 
+    // Filter the data for the selected country
+    //d3.json('https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json').then(function(output) {
+    const countryData = output.filter(song => song.country === countryName);
+    console.log("Country data:", countryData);
  
-        // Prepare data for the bubble chart, limit to 6 songs
-        const bubbleLayout = {
-            title: "Song metrics by Country",
-            x: output.name.slice(0,5).map(songName => output.name),
-            y: output.liveliness.slice(0,5).map(liveliness => output.liveliness), 
-            text: output.name.slice(0,5).map(songName => output.name), 
-            mode: 'markers',
-            marker: {
-                size: output.liveliness.slice(0,6).map(liveliness => liveliness.sizeValue),
-                color: output.name.slice(0,6).map(songName => output.name),
-                colorscale: "Inferno"
+    // Prepare data for the bubble chart, limit to 6 songs
+    const trace = {
+        x: countryData.slice(0,5).map(song => song.name),
+        y: countryData.slice(0,5).map(song => song.liveliness), 
+        text: countryData.slice(0,5).map(song => song.name), 
+        mode: 'markers',
+        marker: {
+            size: countryData.slice(0,5).map(song => song.liveliness * 100),
+            color: countryData.slice(0,5).map(song => song.liveliness),
+            colorscale: "Inferno"
             }
         };
 
-        // Create the bubble chart
-        Plotly.newPlot('bubble', [bubbleData]);
+    // Create the bubble chart
+    Plotly.newPlot('bubble', [trace], {
+        title: "Song metrics for each Country",
+        xaxis: {title: "Song Name"},
+        yaxis: {title: "Liveliness"}
     });
 }
 
 // Function to change the dropdown
-function optionChanged(selectedCountry) {
-    createBubbleChart(selectedCountry);
+function optionChanged(selectedCountry, output) {
+    //d3.json("https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json").then((data) =>
+    createBubbleChart(selectedCountry, output);    
 }
 
 
+// bubbles/markers are not popping up on chart
+// song names are now showing up differently depending on the country selected, yay!
