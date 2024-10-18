@@ -27,12 +27,12 @@ d3.json("https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/mai
     // Attach an event listener to the dropdown menu
     dropdown.on("change", function() {
         const uniqueCountry = d3.select(this).property("value");
-        optionChanged(uniqueCountry, output);
+        optionChanged(uniqueCountry);
     });
 });
 
   // Function to create the bubble chart
-function createBubbleChart(countryName, output) {
+function createBubbleChart(countryName) {
     // Check if output is defined
     if (!output) {
         console.error("Output data is undefined.");
@@ -47,28 +47,32 @@ function createBubbleChart(countryName, output) {
     // Prepare data for the bubble chart, limit to 6 songs
     const trace = {
         x: countryData.slice(0,5).map(song => song.name),
-        y: countryData.slice(0,5).map(song => song.liveliness), 
+        y: countryData.slice(0,5).map(song => song.liveness), 
         text: countryData.slice(0,5).map(song => song.name), 
         mode: 'markers',
         marker: {
-            size: countryData.slice(0,5).map(song => song.liveliness * 100),
-            color: countryData.slice(0,5).map(song => song.liveliness),
+            size: countryData.slice(0,5).map(song => song.liveness * 100),
+            color: countryData.slice(0,5).map(song => song.liveness),
             colorscale: "Inferno"
             }
         };
 
+        console.log("X values:", countryData.slice(0, 5).map(song => song.name));
+        console.log("Y values:", countryData.slice(0, 5).map(song => song.liveliness));
+        console.log("Marker sizes:", countryData.slice(0, 5).map(song => song.liveliness * 100));
+
     // Create the bubble chart
     Plotly.newPlot('bubble', [trace], {
         title: "Song metrics for each Country",
-        xaxis: {title: "Song Name"},
+        xaxis: {title: "Top 6 Song Names"},
         yaxis: {title: "Liveliness"}
     });
 }
 
 // Function to change the dropdown
-function optionChanged(selectedCountry, output) {
+function optionChanged(selectedCountry) {
     //d3.json("https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json").then((data) =>
-    createBubbleChart(selectedCountry, output);    
+    createBubbleChart(selectedCountry);    
 }
 
 
