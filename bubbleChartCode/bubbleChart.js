@@ -47,19 +47,19 @@ function createBubbleChart(countryName) {
     // Prepare data for the bubble chart, limit to 6 songs
     const trace = {
         x: countryData.slice(0,5).map(song => song.name),
-        y: countryData.slice(0,5).map(song => song.liveness), 
-        text: countryData.slice(0,5).map(song => song.name), 
+        y: countryData.slice(0,5).map(song => song.tempo), 
+        text: countryData.slice(0,5).map(song => "Artists: " + song.artists), 
         mode: 'markers',
         marker: {
-            size: countryData.slice(0,5).map(song => song.liveness * 100),
-            color: countryData.slice(0,5).map(song => song.liveness),
+            size: countryData.slice(0,5).map(song => song.tempo),
+            color: countryData.slice(0,5).map(song => song.tempo),
             colorscale: "Inferno"
             }
         };
 
         console.log("X values:", countryData.slice(0, 5).map(song => song.name));
-        console.log("Y values:", countryData.slice(0, 5).map(song => song.liveliness));
-        console.log("Marker sizes:", countryData.slice(0, 5).map(song => song.liveliness * 100));
+        console.log("Y values:", countryData.slice(0, 5).map(song => song.tempo));
+        console.log("Marker sizes:", countryData.slice(0, 5).map(song => song.tempo));
 
     // Create the bubble chart
     Plotly.newPlot('bubble', [trace], {
