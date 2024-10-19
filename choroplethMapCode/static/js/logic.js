@@ -1,20 +1,29 @@
+console.log("app.js loaded");
+
 // Initialize the map
 const map = L.map('map').setView([0, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
+console.log("Map initialized");
+
 // Create a choropleth layer
 let choroplethLayer;
 
 // Load the country data and artist data
+console.log("Starting to load data");
 Promise.all([
     d3.json('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson'),
     d3.json('/api/top_artists')
 ]).then(([worldData, artistData]) => {
+    console.log("Data loaded:", { worldDataLength: worldData.features.length, artistDataLength: artistData.length });
+    
     // Process the artist data to calculate similarities
     const countries = [...new Set(artistData.map(d => d.country))].sort();
     const similarities = calculateSimilarities(artistData);
+
+    console.log("Similarities calculated");
 
     // Populate the dropdown
     const select = document.getElementById('countrySelect');
@@ -25,11 +34,16 @@ Promise.all([
         select.appendChild(option);
     });
 
+    console.log("Dropdown populated");
+
     // Update the map when a country is selected
     select.addEventListener('change', (event) => {
         const selectedCountry = event.target.value;
+        console.log("Country selected:", selectedCountry);
         updateChoropleth(worldData, similarities[selectedCountry]);
     });
+}).catch(error => {
+    console.error("Error loading data:", error);
 });
 
 function calculateSimilarities(data) {
