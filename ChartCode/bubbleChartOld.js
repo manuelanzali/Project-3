@@ -1,10 +1,9 @@
-
 //define the dropdown menu
 const dropdown = d3.select("#selDataset");
 
 //define the output outside of chart
 let output;
-
+ 
  //load in data
  // Build the metadata panel
 d3.json("https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json").then((data) => {
@@ -74,7 +73,7 @@ function optionChanged(selectedCountry) {
     //d3.json("https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/bubbleChartCode/output.json").then((data) =>
     createBubbleChart(selectedCountry);    
 }
-
+// }
 
 // bubbles/markers are not popping up on chart
 // song names are now showing up differently depending on the country selected, yay!

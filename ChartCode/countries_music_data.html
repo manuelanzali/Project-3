@@ -22,8 +22,8 @@
     <div class="row">
       <div class="col-md-3">
         <div class="card card-body bg-light">
-          <h6>Country:</h6>
-          <select id="selDataset" onchange="optionChanged(this.value)"></select>
+          <h6>Metric:</h6>
+          <select id="selDataset"></select>
         </div>
         <br>
 
@@ -41,11 +41,16 @@
         <div id="bubble"></div>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div id="example"></div>
+      </div>
+    </div>
   </div>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script src="./bubbleChart.js"></script>
+  <script src="./exampleChart.js" type="module"></script>
 
 </body>
 
