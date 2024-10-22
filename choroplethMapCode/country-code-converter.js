@@ -1,5 +1,3 @@
-// countryCodeConverter.js
-
 const countryCodeMap = {
     'AE': 'United Arab Emirates',
     'AR': 'Argentina',
