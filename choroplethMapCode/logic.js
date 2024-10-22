@@ -26,7 +26,7 @@ function calculateSimilarities(data) {
                     artists2List.includes(artist)
                 );
                 
-                // Calculate similarity as percentage of shared artists
+                // Calculate the percentage of shared artists
                 const minArtists = Math.min(artists1List.length, artists2List.length);
                 similarities[country1][country2] = {
                     score: sharedArtistsList.length / minArtists,
@@ -171,6 +171,5 @@ function getColor(similarity) {
            percentage >= 60  ? '#E31A1C' : // 3/5 artists shared
            percentage >= 40  ? '#FC4E2A' : // 2/5 artists shared
            percentage >= 20  ? '#FD8D3C' : // 1/5 artists shared
-           percentage > 0    ? '#FEB24C' : // Some similarity
                              '#FFEDA0';   // No shared artists
 }
