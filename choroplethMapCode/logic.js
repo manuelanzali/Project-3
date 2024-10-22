@@ -21,14 +21,21 @@ function calculateSimilarities(data) {
         artistsByCountry.forEach((artists2, country2) => {
             if (country1 !== country2) {
                 const artists2List = artists2.map(d => d.Artist);
-                // Count how many artists from country1 appear in country2
-                const sharedArtists = artists1List.filter(artist => 
+                // Find the shared artists
+                const sharedArtistsList = artists1List.filter(artist => 
                     artists2List.includes(artist)
-                ).length;
+                );
                 
                 // Calculate similarity as percentage of shared artists
                 const minArtists = Math.min(artists1List.length, artists2List.length);
-                similarities[country1][country2] = sharedArtists / minArtists;
+                similarities[country1][country2] = {
+                    score: sharedArtistsList.length / minArtists,
+                    sharedArtists: sharedArtistsList,
+                    totalArtists: {
+                        country1: artists1List,
+                        country2: artists2List
+                    }
+                };
             }
         });
     });
@@ -47,8 +54,8 @@ Promise.all([
     const select = document.getElementById('countrySelect');
     countries.forEach(countryCode => {
         const option = document.createElement('option');
-        option.value = countryCode; // Keep the code as the value
-        option.textContent = convertCountryCode(countryCode); // Display the full name
+        option.value = countryCode;
+        option.textContent = convertCountryCode(countryCode);
         select.appendChild(option);
     });
 
@@ -59,6 +66,12 @@ Promise.all([
         const selectedCountry = event.target.value;
         updateChoropleth(worldData, similarities[selectedCountry]);
     });
+
+    // Trigger initial selection
+    if (countries.length > 0) {
+        select.value = countries[0];
+        select.dispatchEvent(new Event('change'));
+    }
 });
 
 function updateChoropleth(worldData, similarityScores) {
@@ -68,18 +81,44 @@ function updateChoropleth(worldData, similarityScores) {
 
     choroplethLayer = L.geoJSON(worldData, {
         style: feature => ({
-            fillColor: getColor(similarityScores[feature.properties.ISO_A2] || 0),
+            fillColor: getColor((similarityScores[feature.properties.ISO_A2]?.score || 0)),
             weight: 1,
             opacity: 1,
             color: 'white',
             fillOpacity: 0.7
         }),
         onEachFeature: (feature, layer) => {
-            const percentage = ((similarityScores[feature.properties.ISO_A2] || 0) * 100).toFixed(0);
-            const sharedArtists = Math.round((similarityScores[feature.properties.ISO_A2] || 0) * 5);
-            // Use the converted country name in the popup
-            const countryName = convertCountryCode(feature.properties.ISO_A2);
-            layer.bindPopup(`${countryName}: ${percentage}% (${sharedArtists}/5 artists shared)`);
+            const countryData = similarityScores[feature.properties.ISO_A2];
+            
+            if (countryData) {
+                const percentage = (countryData.score * 100).toFixed(0);
+                const countryName = convertCountryCode(feature.properties.ISO_A2);
+                
+                // Create a formatted list of shared artists
+                const sharedArtistsList = countryData.sharedArtists
+                    .map(artist => `• ${artist}`)
+                    .join('<br>');
+                
+                // Create the popup content
+                const popupContent = `
+                    <div style="min-width: 200px">
+                        <h3 style="margin: 0 0 8px 0">${countryName}</h3>
+                        <p style="margin: 0 0 8px 0"><strong>${percentage}% similar</strong> 
+                        (${countryData.sharedArtists.length}/5 artists shared)</p>
+                        ${countryData.sharedArtists.length > 0 ? `
+                            <p style="margin: 0 0 4px 0"><strong>Shared Artists:</strong></p>
+                            <div style="margin-left: 8px">
+                                ${sharedArtistsList}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                layer.bindPopup(popupContent);
+            } else {
+                const countryName = convertCountryCode(feature.properties.ISO_A2);
+                layer.bindPopup(`${countryName}: No data available`);
+            }
         }
     }).addTo(map);
 }
