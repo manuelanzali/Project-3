@@ -34,19 +34,23 @@ function createChartExample(parameterName) {
     });
     console.log(selectedMetrics);
 
-    // //create colorscale
-    // var values = Object.values(selectedMetrics);
-    // var colorScale = d3.scaleSequential(d3.interpolateBlues)
-    //     .domain([Math.min(...values), Math.max(...values)]);
+    //create colorscale
+    var values = Object.values(selectedMetrics);
+    var colorScale = d3.scaleSequential(d3.interpolateReds)
+        .domain(d3.extent(values));
 
     var trace1 = {
         x: Object.keys(selectedMetrics),
         y: Object.values(selectedMetrics),
-        mode: 'markers'
+        mode: 'markers',
+        marker: {
+            color: Object.values(selectedMetrics).map(value => colorScale(value)), // color is based on th escale
+            size: 10 
+        }
     };
-    
 
     Plotly.newPlot('example', [trace1]);
 }
+
 
 buildDropdown();
