@@ -5,6 +5,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Create a choropleth layer
 let choroplethLayer;
+let selectedCountry; 
 
 // Function to calculate similarities between countries
 function calculateSimilarities(data) {
@@ -79,13 +80,20 @@ function updateChoropleth(worldData, similarityScores) {
     }
 
     choroplethLayer = L.geoJSON(worldData, {
-        style: feature => ({
-            fillColor: getColor((similarityScores[feature.properties.ISO_A2]?.score || 0)),
-            weight: 1,
-            opacity: 1,
-            color: 'white',
-            fillOpacity: 0.7
-        }),
+        style: feature => {
+            // Check if this is the selected country
+            const isSelected = feature.properties.ISO_A2 === selectedCountry;
+            
+            return {
+                fillColor: isSelected ? '#4A90E2' : // Highlight color for selected country
+                          getColor((similarityScores[feature.properties.ISO_A2]?.score || 0)),
+                weight: isSelected ? 3 : 1, // Thicker border for selected country
+                opacity: 1,
+                color: isSelected ? '#2171CD' : 'white', // Different border color for selected
+                fillOpacity: isSelected ? 0.8 : 0.7,
+                dashArray: isSelected ? '3' : null // Optional: adds dashed border to selected
+            };
+        },
         onEachFeature: (feature, layer) => {
             const countryData = similarityScores[feature.properties.ISO_A2];
             
@@ -121,6 +129,39 @@ function updateChoropleth(worldData, similarityScores) {
         }
     }).addTo(map);
 }
+
+// Update the event listener in the Promise.all section
+Promise.all([
+    d3.json('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson'),
+    d3.csv('https://raw.githubusercontent.com/manuelanzali/Project-3/refs/heads/main/Resources/top_artists_by_country.csv')
+]).then(([worldData, artistData]) => {
+    // Process the artist data to calculate similarities
+    const countries = [...new Set(artistData.map(d => d.Country))].sort();
+
+    // Populate the dropdown with converted country names
+    const select = document.getElementById('countrySelect');
+    countries.forEach(countryCode => {
+        const option = document.createElement('option');
+        option.value = countryCode;
+        option.textContent = convertCountryCode(countryCode);
+        select.appendChild(option);
+    });
+
+    const similarities = calculateSimilarities(artistData);
+
+    // Update the map when a country is selected
+    select.addEventListener('change', (event) => {
+        selectedCountry = event.target.value; // Update the selected country
+        updateChoropleth(worldData, similarities[selectedCountry]);
+    });
+
+    // Trigger initial selection
+    if (countries.length > 0) {
+        selectedCountry = countries[0]; // Set initial selected country
+        select.value = selectedCountry;
+        select.dispatchEvent(new Event('change'));
+    }
+});
 
 function getColor(similarity) {
     const percentage = similarity * 100;
