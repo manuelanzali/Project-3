@@ -20,10 +20,7 @@ with open(csv_path, 'r', newline='', encoding='utf-8') as csvfile:
 # Convert the set to a sorted list
 countries_list = sorted(countries_set)
 
-# Print the list of countries
-print(countries_list)
-
-import csv
+# Using defaultdict to help simplify data collection
 from collections import defaultdict
 
 def get_top_artists_by_country(csv_path, top_n=5):
@@ -73,5 +70,3 @@ csv_path = 'Top_Spotify_Songs_in_73_Countries_coord1.csv'
 output_path = 'top_artists_by_country.csv'
 top_artists = get_top_artists_by_country(csv_path)
 write_top_artists_to_csv(top_artists, output_path)
-
-print("Top artists by country have been written to", output_path)
