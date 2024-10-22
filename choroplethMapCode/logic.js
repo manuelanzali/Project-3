@@ -85,11 +85,11 @@ function updateChoropleth(worldData, similarityScores) {
             const isSelected = feature.properties.ISO_A2 === selectedCountry;
             
             return {
-                fillColor: isSelected ? '#4A90E2' : // Highlight color for selected country
+                fillColor: isSelected ? '#2ECC71' : // Highlight color for selected country
                           getColor((similarityScores[feature.properties.ISO_A2]?.score || 0)),
                 weight: isSelected ? 3 : 1, // Thicker border for selected country
                 opacity: 1,
-                color: isSelected ? '#2171CD' : 'white', // Different border color for selected
+                color: isSelected ? '#27AE60' : 'white', // Different border color for selected
                 fillOpacity: isSelected ? 0.8 : 0.7,
                 dashArray: isSelected ? '3' : null // Optional: adds dashed border to selected
             };
