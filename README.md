@@ -14,7 +14,7 @@ Link to Proposal: https://sites.google.com/view/project3data-visualization/home
 6. Citations
 
 ## About our Analysis
-● The object of this analysis was to explore data surrounding music trends and analyzing what kind of music individuals globally enjoy listening to and why.
+● The objective of this analysis was to explore data surrounding music trends and analyzing what kind of music individuals globally enjoy listening to and why.
 
 ● To achieve this, we analyzed a Spotify dataset gathered from 73 different countries. This dataset has 25 variables, including Spotify ID, track name, artist, daily rank, country, and several musical characteristics such as valence (which measures the song's positivity), danceability, energy, key, acousticness, and tempo. 
 
